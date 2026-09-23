@@ -716,7 +716,9 @@ Escribe una consulta que calcule y devuelva una columna llamada `porcentaje_me_g
 
 Solución:
 ```sql
-
+select round(me_gusta*1.0/ reproducciones * 100.0,1) as porcentaje_me_gusta
+from cancion
+limit 10;
 ```
 
 | porcentaje_me_gusta |
@@ -783,7 +785,9 @@ Escribe una consulta que calcule y devuelva una columna llamada `que_donde` que 
 
 Solución:
 ```sql
-
+select round(me_gusta*1.0/ reproducciones * 100.0,1) as porcentaje_me_gusta
+from cancion
+limit 10;
 ```
 
 | que_donde           |
