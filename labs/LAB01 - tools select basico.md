@@ -264,7 +264,9 @@ Escribe una consulta SQL para seleccionar las columnas título (`titulo`) y repr
 
 Solución:
 ```sql
-
+select titulo, reproducciones
+from cancion_muestra
+order by reproducciones desc;
 ```
 
 | titulo                | reproducciones |
@@ -408,7 +410,8 @@ Escribe una consulta para seleccionar las distintas combinaciones de país (`pai
 
 Solución:
 ```sql
-
+select distinct pais, genero
+from cancion
 ```
 
 | pais           | genero |
@@ -463,7 +466,9 @@ Escribe una consulta para seleccionar las reproducciones (`reproducciones`) de l
 
 Solución:
 ```sql
-
+select reproducciones
+from cancion
+where reproducciones<1000000
 ```
 
 | reproducciones |
@@ -486,7 +491,9 @@ Escribe otra consulta para seleccionar el género (`genero`) y el idioma (`idiom
 
 Solución:
 ```sql
-
+select distinct genero, idioma
+from cancion
+where reproducciones<1000000
 ```
 
 | genero | idioma |
@@ -556,7 +563,9 @@ Utiliza el operador not para seleccionar las canciones (solo las columnas `titul
 
 Solución:
 ```sql
-
+select titulo, genero, pais
+from cancion
+where genero!="Rap";
 ```
 
 | titulo                     | genero | pais           |
@@ -597,7 +606,9 @@ El operador `OR` de SQL es un operador ‘o inclusivo’: se ejecuta correctamen
 
 Solución:
 ```sql
-
+select titulo, idioma, pais
+from cancion
+where (idioma='ES')<>(pais='España');
 ```
 
 | titulo           | idioma | pais           |
@@ -667,8 +678,8 @@ Salida:
 | ---------- | ---------------------------------------------------------- |
 | Round(X)   | Redondea el número X su entero más cercano                 |
 | Round(X,Y) | Redondea el número X a Y decimales                         |
-| Ceil(X)  | Redondea el número hacia el entero inmediatamente superior |
-| Floor(X) | Redondea el número hacia el entero inmediatamente inferior |
+| Ceil(X)    | Redondea el número hacia el entero inmediatamente superior |
+| Floor(X)   | Redondea el número hacia el entero inmediatamente inferior |
 | Abs(X)     | Valor absoluto de X                                        |
 | Sqrt(X)    | Raíz cuadrada de X                                         |
 
