@@ -4,7 +4,6 @@
 tags: database, lecture, relational-model
 author: rre
 origin: BD2425/teoria/Chapter05-es.pptx
-date: 2025-09-01
 
 ---
 # Origen
