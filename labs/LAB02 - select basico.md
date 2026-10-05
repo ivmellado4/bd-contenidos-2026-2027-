@@ -687,7 +687,7 @@ Solución:
 ```sql
 select 
 	anio, 
-    count(*) as cantidad_canciones
+    count(*) as canciones_mismo_anio
 from cancion
 group by anio
 order by anio asc;
@@ -806,8 +806,11 @@ Escribe una consulta que cuente el número de canciones de cada una de las sigui
 
 Solución:
 ```sql
-
-
+select
+    count(case when duracion < 200 then 1 end) as corta,
+    count(case when duracion between 200 and 300 then 1 end) as media,
+    count(case when duracion > 300 then 1 end) as larga
+from cancion;
 ```
 
 Resultado:
