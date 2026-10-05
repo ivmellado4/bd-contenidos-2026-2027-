@@ -21,8 +21,12 @@ Escribe una consulta que calcule y devuelva una columna llamada `que_donde` que 
 
 Solución:
 ```sql
-
-
+select concat(upper(genero),' ',lower(pais))as que_donde,
+round(me_gusta*1.0/ reproducciones * 100.0,1) as porcentaje_me_gusta
+from cancion
+where (idioma!='ES')
+order by porcentaje_me_gusta desc 
+limit 10;
 ```
 
 Resultado:
@@ -167,8 +171,17 @@ Para emitir una canción en la radio hay que añadirle una cuña publicitaria. E
 
 Solución:
 ```sql
-
-
+select distinct 
+	titulo,
+	pais,
+	duracion,
+	round((case
+		when pais='Reino Unido' then duracion +30
+		when pais='España' then duracion +45
+	end)/60.0,2) as duracion_radio_min
+from cancion
+order by duracion desc
+limit 20;
 ```
 
 Resultado:
@@ -371,8 +384,10 @@ Escribe una consulta para encontrar las canciones (`cancion`) cuya duración (`d
 
 Solución:
 ```sql
-
-
+select *
+from cancion
+where duracion is not null
+  and (idioma is null or idioma='');
 ```
 
 Resultado:
@@ -471,8 +486,11 @@ Escribe una consulta que devuelva todas las columnas de las canciones y añada u
 
 Solución:
 ```sql
-
-
+select *,
+	coalesce(duracion, reproducciones, me_gusta, valoracion, -1) as primer_dato
+from cancion
+order by id_cancion desc
+limit 10;
 ```
 
 Resultado:
@@ -554,8 +572,10 @@ Salida:
 
 Solución:
 ```sql
-
-
+select 
+	avg(reproducciones) as "avg(reproducciones)"
+from cancion
+where reproducciones>1000000;
 ```
 
 Resultado:
@@ -594,8 +614,9 @@ Salida:
 
 Solución:
 ```sql
-
-
+select 
+	count(distinct anio) as anios_distintos
+from cancion
 ```
 
 Resultado:
@@ -664,8 +685,12 @@ Escribe una consulta que muestre cada año de publicación (`anio`) distinto en 
 
 Solución:
 ```sql
-
-
+select 
+	anio, 
+    count(*) as cantidad_canciones
+from cancion
+group by anio
+order by anio asc;
 ```
 
 Resultado:
