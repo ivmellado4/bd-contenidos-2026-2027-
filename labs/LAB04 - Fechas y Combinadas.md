@@ -23,7 +23,12 @@ Escribe una consulta que devuelva el sueldo medio por departamento para departam
 
 Solución:
 ```sql
-
+select dpto,
+	avg(sueldo)as sueldo_medio
+from empleado
+where dpto is not null
+group by dpto
+having count(*)>1
 ```
 
 Resultado:
@@ -242,16 +247,21 @@ Escribe una consulta para obtener el nombre, apellido1 y fechaNac de los emplead
 
 Solución:
 ```sql
-
+select 
+  nombre, 
+  apellido1,
+  fechaNac
+from empleado
+where cast(strftime('%Y', fechaNac)as integer) between 1955 and 1965;
 ```
 
 Tabla resultado:
 
-| nombre   | apellido1 | fechaNac   |
-| -------- | --------- | ---------- |
-| José     | Pérez     | 1965-09-01 |
-| Alberto  | Campos    | 1955-12-08 | 
-| Fernando | Ojeda     | 1962-09-15 |
+| nombre   | apellido1 | fechaNac   |     |
+| -------- | --------- | ---------- | --- |
+| José     | Pérez     | 1965-09-01 |     |
+| Alberto  | Campos    | 1955-12-08 |     |
+| Fernando | Ojeda     | 1962-09-15 |     |
 
 ---
 
@@ -519,7 +529,16 @@ Escribe una consulta que devuelva los empleados con más de un familiar que no s
 
 Solución:
 ```sql
+select distinct empleado
+from familiar
+group by empleado
+having count(*)>1
 
+except
+
+select distinct supervisor
+from empleado
+where supervisor is not null;
 ```
 
 Tabla resultado:
@@ -649,8 +668,19 @@ Escribe una consulta que devuelva el dni de los empleados que no tienen familiar
 
 Solución:
 ```sql
+select dni 
+from empleado
+where dni not in(select distinct empleado 
+				from familiar 
+				where empleado is not null)
 
+union
 
+select supervisor as dni
+from empleado
+where supervisor is not null
+group by supervisor
+having count(*)>2;
 ```
 
 Tabla resultado:
@@ -770,7 +800,20 @@ Escribe una consulta que devuelva los proyectos del departamento con mayor núme
 
 Solución:
 ```sql
-
+with DeptMasTrabajadores as(
+    select dpto
+    from empleado
+    where dpto is not null
+    group by dpto
+    order by count(dni) desc
+    limit 1
+)
+select 
+    nombre,
+    ubicacion,
+    dpto
+from proyecto
+where dpto= (select dpto from DeptMasTrabajadores);
 ```
 
 Tabla resultado:

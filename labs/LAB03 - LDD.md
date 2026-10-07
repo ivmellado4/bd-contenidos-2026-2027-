@@ -27,7 +27,10 @@ Escribe una consulta que utilice un filtro para calcular simultáneamente las ma
 
 Solución:
 ```sql
-
+select
+	round(avg(reproducciones) filter (where reproducciones > 100000000), 2) as media_exitos,
+    round(avg(reproducciones) filter (where reproducciones < 1000000), 2) as media_minoritarias
+from cancion;
 ```
 
 Resultado:
@@ -189,7 +192,25 @@ $FAMILIAR$(empleado, nombre, sexo, fechaNac, relación\*)
 
 Solución:
 ```sql
+create table FAMILIAR(
+	empleado INTEGER NOT NULL,
+	nombre TEXT NOT NULL,
+	sexo TEXT NOT NULL,
+	fechaNac TEXT NOT NULL,
+	relacion TEXT NOT NULL) STRICT;
+	
+INSERT INTO FAMILIAR(empleado, nombre, sexo, fechaNac, relacion)VALUES
+(333445555,'Alicia','F','1986-04-06','Hija'),
+(333445555,'Teodoro','M','1983-10-25','Hijo'),
+(333445555,'Luisa','F','1958-05-03','Esposa'),
+(987654321,'Alfonso','M','1942-02-28','Esposo'),
+(123456789,'Miguel','M','1988-01-04','Hijo'),
+(123456789,'Alice','F','1988-12-30','Hija'),
+(123456789,'Elisa','F','1967-05-05','Esposa');
 
+select * 
+from FAMILIAR
+where sexo= 'M'
 ```
 
 Tabla resultado:
