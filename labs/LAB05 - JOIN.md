@@ -21,14 +21,23 @@ Escribe una consulta para obtener el nombre del departamento, su director, su fe
 
 Solución:
 ```sql
-
+select
+	d.nombre,
+	d.director,
+	d.fechaIngresoDirector as fecha,
+	max(strftime("%m",fechaIngresoDirector)) as mes
+from DEPARTAMENTO d
+where d.fechaIngresoDirector is not null
+order by 
+    abs(cast(strftime('%m', d.fechaIngresoDirector) as integer)- 12) asc
+limit 1;
 ```
 
 Tabla resultado:
 
-| nombre       | director  | fecha      | mes | 
-| ------------ | --------- | ---------- | --- |
-| Sede Central | 888665555 | 1981-06-19 | 06  |
+| nombre       | director  | fecha      | mes |     |
+| ------------ | --------- | ---------- | --- | --- |
+| Sede Central | 888665555 | 1981-06-19 | 06  |     |
 
 ---
 
@@ -170,19 +179,25 @@ Tabla resultado:
 Escribe una consulta que devuelva el nombre de cada proyecto (nombre_proyecto) y el total de horas trabajadas en cada uno (total_horas_dedicadas), ordena los resultados por las horas trabajabas empezando por el de mayor horas. 
 
 ```sql
-
+select
+	p.nombre as nombre_proyecto,
+	SUM(t.horas) as total_horas_dedicadas
+from PROYECTO p
+left join TRABAJA_EN t on p.numero = t.proyecto
+group by p.numero, p.nombre
+order by total_horas_dedicadas desc, p.nombre desc;
 ```
 
 Tabla resultado:
 
-| nombre_proyecto | total_horas_dedicadas |
-| --------------- | --------------------- |
-| Comunicaciones  | 55                    | 
-| Computación     | 55                    |
-| ProductoX       | 52.5                  |
-| ProductoZ       | 50                    |
-| ProductoY       | 37.5                  |
-| Reorganización  | 25                    |
+| nombre_proyecto | total_horas_dedicadas |     |
+| --------------- | --------------------- | --- |
+| Comunicaciones  | 55                    |     |
+| Computación     | 55                    |     |
+| ProductoX       | 52.5                  |     |
+| ProductoZ       | 50                    |     |
+| ProductoY       | 37.5                  |     |
+| Reorganización  | 25                    |     |
 
 ---
 
@@ -260,7 +275,15 @@ Escribe una consulta que devuelva el nombre (nombre_empleado) y apellido1 de emp
 Solución:
 
 ```sql
-
+select
+	e.nombre as nombre_empleado,
+	e.apellido1,
+	p.nombre as nombre_proyecto,
+	p.ubicacion
+from EMPLEADO e
+inner join TRABAJA_EN t on (e.dni=t.empleado)
+inner join PROYECTO p on (p.numero=t.proyecto)
+order by nombre_empleado asc;
 ```
 
 Tabla resultado:
@@ -320,7 +343,14 @@ Tabla resultado:
 Escribe una consulta que devuelva los empleados que ganan entre 2000 y 10000 euros menos que su supervisor directo. Las columnas resultado deben ser: nombre_empleado, sueldo_empleado, nombre_supervisor y sueldo_supervisor.
 
 ```sql
-
+select
+	e.nombre as nombre_empleado,
+	e.sueldo as sueldo_empleado,
+	s.nombre as nombre_supervisor,
+	s.sueldo as sueldo_supervisor
+from EMPLEADO e
+join EMPLEADO s on e.supervisor=s.dni
+where (s.sueldo - e.sueldo) between 2000 and 10000;
 ```
 
 Tabla resultado:
@@ -486,7 +516,15 @@ INSERT INTO Proyecto VALUES ('ProductoGTP',6,'Madrid',5);
 
 Solución:
 ```sql
-
+INSERT INTO Proyecto VALUES ('ProductoGTP',6,'Madrid',5);
+select
+	p.nombre as nombre_proyecto,
+	e.nombre as nombre_empleado,
+	t.horas as horas
+from PROYECTO p
+left join TRABAJA_EN t on p.numero=t.proyecto
+left join EMPLEADO e on t.empleado=e.dni
+order by nombre_proyecto asc, nombre_empleado asc;
 ```
 
 Tabla resultado:
@@ -617,18 +655,24 @@ Obtener un listado con el nombre completo de los empleados que **NO** tienen nin
 
 Solución:
 ```sql
-
+select 
+	e.nombre,
+	e.apellido1,
+	e.apellido2
+from EMPLEADO e
+left join FAMILIAR f on (e.dni=f.empleado)
+where f.empleado is null;
 ```
 
 Tabla resultado:
 
-| nombre   | apellido1 | apellido2 |
-| -------- | --------- | --------- |
-| Alicia   | Jiménez   | Celaya    | 
-| Fernando | Ojeda     | Ordóñez   |
-| Aurora   | Oliva     | Azevuela  |
-| Luis     | Pajares   | Morera    |
-| Eduardo  | Ochoa     | Paredes   |
+| nombre   | apellido1 | apellido2 |     |
+| -------- | --------- | --------- | --- |
+| Alicia   | Jiménez   | Celaya    |     |
+| Fernando | Ojeda     | Ordóñez   |     |
+| Aurora   | Oliva     | Azevuela  |     |
+| Luis     | Pajares   | Morera    |     |
+| Eduardo  | Ochoa     | Paredes   |     |
 
 ---
 

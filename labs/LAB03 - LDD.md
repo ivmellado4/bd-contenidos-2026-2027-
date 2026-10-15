@@ -268,7 +268,15 @@ Reescribe la definición de la tabla de `FAMILIAR` para agregar las siguientes r
 
 Solución
 ```sql
-
+create table familiar(
+  empleado text not null,
+  nombre text not null,
+  sexo text not null check(sexo in('m','f','o')),
+  fechaNac text not null,
+  relacion text not null check (relacion in ('hijo','hija','conyuge','hermano','hermana')),
+  primary key (empleado, nombre),
+  foreign key (empleado) references empleado(dni) on update cascade on delete cascade
+)strict;
 ```
 
 Para verificar tu respuesta, selecciona su definición de la tabla sqlite_schema mediante la siguiente consulta:
@@ -454,7 +462,18 @@ En caso de ser una sola columna, crea una restricción a nivel de columna.
 
 Solución:
 ```sql
-
+create table empleado( 
+nombre text not null,
+apellido1 text not null,
+apellido2 text,
+dni text PRIMARY KEY not null,
+fechaNac text not null,
+direccion text,
+sexo text not null,
+sueldo real not null,
+supervisor text,
+dpto integer not null
+)strict;
 ```
 
 Para verificar tu respuesta, selecciona su definición de la tabla sqlite_schema mediante la siguiente consulta:
@@ -725,7 +744,15 @@ Reescribe la definición de la tabla de `FAMILIAR` para agregar su clave primari
 
 Solución
 ```sql
-
+create table familiar(
+    empleado text not null,
+    nombre text not null,
+    sexo text not null check (sexo in ('m', 'f', 'o')),
+    fechaNac text not null,
+    relacion text check (relacion in ('hijo', 'hija', 'conyuge', 'hermano', 'hermana')),
+    primary key(empleado, nombre),
+    foreign key (empleado) references empleado(dni) on update cascade on delete cascade
+) strict;
 ```
 
 Para verificar tu respuesta, selecciona su definición de la tabla sqlite_schema mediante la siguiente consulta:
@@ -739,9 +766,9 @@ from sqlite_schema where type='table' and Lower(name)='familiar';
 
 Tabla resultado:
 
-| name     | sql                                                                                                                                                                                                                                                                                                             | 
-| -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| familiar | createtablefamiliar(empleadotextnotnull,nombretextnotnull,sexotextnotnullcheck(sexoin('m','f','o')),fechanactextnotnull,relaciontextcheck(relacionin('hijo','hija','conyuge','hermano','hermana')),primarykey(empleado,nombre),foreignkey(empleado)referencesempleado(dni)onupdatecascadeondeletecascade)strict |
+| name     | sql                                                                                                                                                                                                                                                                                                             |     |
+| -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- |
+| familiar | createtablefamiliar(empleadotextnotnull,nombretextnotnull,sexotextnotnullcheck(sexoin('m','f','o')),fechanactextnotnull,relaciontextcheck(relacionin('hijo','hija','conyuge','hermano','hermana')),primarykey(empleado,nombre),foreignkey(empleado)referencesempleado(dni)onupdatecascadeondeletecascade)strict |     |
 
 ---
 ## Tipos de asociaciones entre tablas
@@ -879,7 +906,13 @@ Elimina la columna `valoracion` de la tabla `UBICACION`  (anteriormente, `LOCALI
 
 Solución:
 ```sql
+create table "ubicacion" (
+    dpto integer not  null,
+    ubicacion text not null,
+    PRIMARY KEY (dpto, ubicacion) 
+) strict;
 
+alter table UBICACION drop column valoracion;
 ```
 
 Para verificar tu respuesta, selecciona su definición de la tabla sqlite_schema mediante la siguiente consulta:
@@ -957,7 +990,26 @@ Abre en otra pestaña [SQL Snippets con la base de datos pnguins](https://i3lab.
 Solución:
 
 ```sql
+create view media_peso_por_especie_sexo as
+select 
+    lower(species) as species,
+    lower(sexo) as sexo,
+    round(avg(peso), 2) as peso_promedio
+from pinguinos
+where species is not null 
+  AND sexo is not null
+group by species, sexo
+order by species asc, sexo asc;
 
+select 
+    lower(species) as species,
+    lower(sex) as sex,
+    round(avg(body_mass_g), 2) as peso_promedio
+from penguins
+where species is not null 
+  AND sex is not null
+group by species, sex
+order by species asc, sex asc;
 ```
 
 Tabla resultado:
