@@ -979,48 +979,35 @@ Tabla resultado:
 
 ## Ejercicio 7 - Vistas
 
-Con fines analíticos y comparativos, se desea crear una nueva vista (`avg_weight_by_species_sex`) en la base de datos penguins que muestre el peso promedio, con una precisión de dos decimales, de los pingüinos por cada especie y sexo. Se debe evitar la aparición de valores nulos para que no complique el análisis posterior.
+Con fines analíticos y comparativos, se desea crear una nueva vista (media_reproducciones_por_genero_idioma) en la base de datos de streaming que muestre el número medio de reproducciones, con una precisión de dos decimales, de las canciones por cada género e idioma. Se debe evitar la aparición de valores nulos para que no complique el análisis posterior.
 
-¿De qué especie son las hembras más pesadas?
+¿De qué género son las canciones en español que más se escuchan de media?
 
-Para comprobar tu solución usa la vista definida desde una setencia `SELECT *`;
+Para comprobar tu solución usa la vista definida desde una sentencia SELECT *.
 
 Abre en otra pestaña [SQL Snippets con la base de datos pnguins](https://i3lab.unex.es/sql-snippets/index.html?db=penguins) para solucionar este ejercicio.
 
 Solución:
 
 ```sql
-create view media_peso_por_especie_sexo as
-select 
-    lower(species) as species,
-    lower(sexo) as sexo,
-    round(avg(peso), 2) as peso_promedio
-from pinguinos
-where species is not null 
-  AND sexo is not null
-group by species, sexo
-order by species asc, sexo asc;
+CREATE VIEW media_reproducciones_por_genero_idioma AS
+SELECT genero, idioma, round(AVG(reproducciones), 2) AS media_reproducciones
+FROM cancion
+WHERE idioma IS NOT NULL
+GROUP BY genero, idioma;
 
-select 
-    lower(species) as species,
-    lower(sex) as sex,
-    round(avg(body_mass_g), 2) as peso_promedio
-from penguins
-where species is not null 
-  AND sex is not null
-group by species, sex
-order by species asc, sex asc;
+select * from media_reproducciones_por_genero_idioma;
 ```
 
 Tabla resultado:
 
-| species   | sex    | peso_promedio |
+|           |        |               |
 | --------- | ------ | ------------- |
-| Adelie    | FEMALE | 3368.84       |
-| Adelie    | MALE   | 4043.49       |
-| Chinstrap | FEMALE | 3527.21       |
-| Chinstrap | MALE   | 3938.97       |
-| Gentoo    | FEMALE | 4679.74       |
-| Gentoo    | MALE   | 5484.84       |
+|           |        |               |
+|           |        |               |
+|           |        |               |
+|           |        |               |
+|           |        |               |
+|           |        |               |
 
 ---

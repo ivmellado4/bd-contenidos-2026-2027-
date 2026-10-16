@@ -831,7 +831,15 @@ Escribe una consulta que devuelva para cada departamento su nombre (nombre_depar
 Solución:
 
 ```sql
-
+select 
+	d.nombre as nombre_departamento,
+	count(distinct p.numero)as num_proyectos,
+	sum(t.horas) as total_horas_dedicadas
+from DEPARTAMENTO d
+left join PROYECTO p on d.numero= p.dpto
+left join TRABAJA_EN t on p.numero= t.proyecto
+group by d.numero,d.nombre
+order by total_horas_dedicadas desc;
 ```
 
 Tabla resultado:
