@@ -32,16 +32,26 @@ La dirección de la empresa necesita un informe completo sobre la situación de 
 
 Solución:
 ```sql
-
+select
+	d.nombre as nombre_departamento,
+  	concat(e1.nombre,' ', e1.apellido1) as nombre_director,
+    count(distinct case when e2.dni <> d.director then e2.dni end) as num_empleados,
+    count(distinct p.numero) as num_proyectos
+from DEPARTAMENTO d
+inner join EMPLEADO e1 on d.director= e1.dni
+left join EMPLEADO e2 on d.numero= e2.dpto
+left join PROYECTO p on d.numero= p.dpto
+group by d.numero, d.nombre, e1.nombre, e1.apellido1
+order by num_empleados desc;
 ```
 
 Tabla resultado:
 
-| nombre_departamento | nombre_director | num_empleados | num_proyectos | 
-| ------------------- | --------------- | ------------- | ------------- |
-| Investigación       | Alberto Campos  | 3             | 3             |
-| Administración      | Juana Sáinz     | 2             | 2             |
-| Sede Central        | Eduardo Ochoa   | 0             | 1             |
+| nombre_departamento | nombre_director | num_empleados | num_proyectos |     |
+| ------------------- | --------------- | ------------- | ------------- | --- |
+| Investigación       | Alberto Campos  | 3             | 3             |     |
+| Administración      | Juana Sáinz     | 2             | 2             |     |
+| Sede Central        | Eduardo Ochoa   | 0             | 1             |     |
 
 ---
 ## Subconsultas
@@ -176,7 +186,15 @@ Escribe una consulta que muestre los nombres de los departamentos cuyo sueldo me
 
 Solución:
 ```sql
-
+select
+	d.nombre,
+	avg(e.sueldo) as sueldoMedio
+from EMPLEADO e 
+inner join DEPARTAMENTO d on e.dpto= d.numero
+group by d.numero, d.nombre
+having avg(e.sueldo)>(select avg(sueldo)
+						 from EMPLEADO
+					 );
 ```
 
 Tabla resultado:
@@ -291,7 +309,16 @@ Escribe una consulta que liste el nombre y apellido de los empleados que trabaja
 
 Solución:
 ```sql
-
+select distinct
+	e.nombre,
+	e.apellido1
+from EMPLEADO e
+inner join TRABAJA_EN t on e.dni= t.empleado
+where t.proyecto in (select p.numero
+					from PROYECTO p
+					where p.ubicacion= 'Madrid'
+					)
+order by e.apellido1 asc, e.nombre asc;
 ```
 
 Tabla resultado:
@@ -431,21 +458,28 @@ Escribe una consulta que liste el el nombre y apellido de cada empleado junto co
 
 Solución:
 ```sql
-
+select
+	e1.nombre,
+	e1.apellido1,
+	e1.sueldo - (select avg(sueldo)
+				 from EMPLEADO e2
+				 where e2.dpto = e1.dpto)as diferenciaSueldoMedio
+from EMPLEADO e1
+order by diferenciaSueldoMedio desc;
 ```
 
 Tabla resultado:
 
-| nombre   | apellido1 | diferenciaSueldoMedio | 
-| -------- | --------- | --------------------- |
-| Juana    | Sáinz     | 12000                 |
-| Alberto  | Campos    | 6750                  |
-| Fernando | Ojeda     | 4750                  |
-| Eduardo  | Ochoa     | 0                     |
-| José     | Pérez     | -3250                 |
-| Alicia   | Jiménez   | -6000                 |
-| Luis     | Pajares   | -6000                 |
-| Aurora   | Oliva     | -8250                 |
+| nombre   | apellido1 | diferenciaSueldoMedio |     |
+| -------- | --------- | --------------------- | --- |
+| Juana    | Sáinz     | 12000                 |     |
+| Alberto  | Campos    | 6750                  |     |
+| Fernando | Ojeda     | 4750                  |     |
+| Eduardo  | Ochoa     | 0                     |     |
+| José     | Pérez     | -3250                 |     |
+| Alicia   | Jiménez   | -6000                 |     |
+| Luis     | Pajares   | -6000                 |     |
+| Aurora   | Oliva     | -8250                 |     |
 
 ---
 ## Devuelve un conjunto de valores: `WHERE`
@@ -518,7 +552,16 @@ Escribe una consulta que liste el nombre de los proyectos donde trabaja al menos
 
 Solución:
 ```sql
-
+select
+	p.nombre
+from PROYECTO p
+where p.numero in(select t.proyecto
+    from TRABAJA_EN t
+    inner join EMPLEADO e on t.empleado = e.dni
+    inner join DEPARTAMENTO d on e.dpto = d.numero
+    where d.nombre= 'Investigación'
+)
+order by p.nombre asc;
 ```
 
 Tabla resultado:
@@ -600,28 +643,54 @@ WHERE dpto=5;
 Aumenta un 20% el sueldo de los empleados que trabajan más horas totales que el promedio de horas trabajadas por los empleados que tienen horas trabajadas.
 
 Después de la actualización, consulta la tabla empleado con:
-
 ```
 SELECT nombre, apellido1, sueldo FROM EMPLEADO;
 ```
 
+```
+update EMPLEADO
+set sueldo= sueldo * 1.2
+where dni in (
+    select empleado 
+    from TRABAJA_EN 
+    group by empleado 
+    having sum(horas) > (
+        select avg(total_horas) 
+        from (
+            select sum(horas) as total_horas 
+            from TRABAJA_EN 
+            group by empleado
+        )
+    )
+);
+```
+
 Solución:
 ```sql
-
+update EMPLEADO
+set sueldo= sueldo*1.20
+where dni in(select t1.empleado
+			 from TRABAJA_EN t1
+			 group by t1.empleado
+			 having sum(t1.horas)>(select avg(horas_totales_por_empleado)
+								   from (select sum(t2.horas) AS horas_totales_por_empleado
+										 FROM TRABAJA_EN t2
+										 GROUP BY t2.empleado
+										) 
 ```
 
 Tabla resultado:
 
-| nombre   | apellido1 | sueldo | 
-| -------- | --------- | ------ |
-| José     | Pérez     | 36000  |
-| Alberto  | Campos    | 48000  |
-| Alicia   | Jiménez   | 30000  |
-| Juana    | Sáinz     | 43000  |
-| Fernando | Ojeda     | 45600  |
-| Aurora   | Oliva     | 30000  |
-| Luis     | Pajares   | 30000  |
-| Eduardo  | Ochoa     | 55000  |
+| nombre   | apellido1 | sueldo |     |
+| -------- | --------- | ------ | --- |
+| José     | Pérez     | 36000  |     |
+| Alberto  | Campos    | 48000  |     |
+| Alicia   | Jiménez   | 30000  |     |
+| Juana    | Sáinz     | 43000  |     |
+| Fernando | Ojeda     | 45600  |     |
+| Aurora   | Oliva     | 30000  |     |
+| Luis     | Pajares   | 30000  |     |
+| Eduardo  | Ochoa     | 55000  |     |
 
 ---
 ## Operadores típicos de subconsultas
@@ -738,7 +807,10 @@ Escribe una consulta que devuelva el `dni` de los empleados que no tienen ningú
 
 Solución:
 ```sql
-
+select dni 
+from EMPLEADO 
+where dni not in(select empleado from FAMILIAR)
+order by dni;
 ```
 
 Tabla resultado:
@@ -796,7 +868,20 @@ WHERE P.ubicacion = 'Madrid';
 
 Solución:
 ```sql
-
+SELECT 
+    E.nombre,
+    E.apellido1
+FROM EMPLEADO E
+WHERE E.dni IN (
+    SELECT T.empleado
+    FROM TRABAJA_EN T
+    WHERE T.proyecto IN (
+        SELECT P.numero
+        FROM PROYECTO P
+        WHERE P.ubicacion = 'Madrid'
+    )
+)
+ORDER BY E.nombre;
 ```
 
 Tabla resultado:
