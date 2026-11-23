@@ -164,6 +164,21 @@ A continuación vamos a hacer la primera especialización de Persona_UEx entre E
 
 Escribe el texto BigER necesario para modelar todo esto y visualiza el resultado en el diagrama en VsCode. Antes de continuar asegúrate de estar entendiendo cómo se está representando gráficamente todo.
 
+SOLUCIÓN:
+entity Persona_UEX{
+    nif key
+}
+
+hierarchy h_persona Persona_UEX total overlapping
+
+entity Empleado extends h_persona{
+    nif key
+}
+
+entity Estudiante extends h_persona{
+    nif key
+}
+
 ---
 
 ### Ejercicio 02 - Jerarquías (2)
@@ -187,6 +202,41 @@ nif `key`
 A continuación vamos a añadir la especialización de Docente en Catedratico y Titular (ten en cuenta que existen más subtipos de docente que no van a aparecer en nuestra jerarquía (Sustituto, Ayudante,...) aparte de estos dos antes de contestar.
 
 Escribe el texto BigER necesario para modelar todo esto y visualiza el resultado en el diagrama en VsCode. Antes de continuar asegúrate de estar entendiendo cómo se está representando gráficamente todo.
+
+SOLUCIÓN:
+entity Persona_UEX{
+    nif key
+}
+
+hierarchy h_persona Persona_UEX total overlapping
+
+entity Empleado extends h_persona{
+    nif key
+}
+
+entity Estudiante extends h_persona{
+    nif key
+}
+
+hierarchy por_tipo_empleado Empleado total overlapping
+
+entity Docente extends por_tipo_empleado{
+    nif key
+}
+
+entity PTGAS extends por_tipo_empleado{
+    nif key
+}
+
+hierarchy por_tipo_docente Docente partial disjoint
+
+entity Catedratico extends por_tipo_docente{
+    nif key
+}
+
+entity Titular extends por_tipo_docente{
+    nif key
+}
 
 ---
 
@@ -216,6 +266,69 @@ nif `key`
 A continuación vamos a añadir la especialización de Estudiante_Politecnica en Estudiante_Informatica, Estudiante_Civil y Estudiante_Edificacion y ten en cuenta que puede haber estudiantes de varias titulaciones a la vez y que hay más titulaciones en Politécnica.
 
 Escribe el texto BigER necesario para modelar todo esto y visualiza el resultado en el diagrama en VsCode. Antes de continuar asegúrate de estar entendiendo cómo se está representando gráficamente todo.
+
+SOLUCIÓN:
+entity Persona_UEX{
+    nif key
+}
+
+hierarchy h_persona Persona_UEX total overlapping
+
+entity Empleado extends h_persona{
+    nif key
+}
+
+entity Estudiante extends h_persona{
+    nif key
+}
+
+hierarchy por_tipo_empleado Empleado total overlapping
+
+entity Docente extends por_tipo_empleado{
+    nif key
+}
+
+entity PTGAS extends por_tipo_empleado{
+    nif key
+}
+
+hierarchy por_tipo_docente Docente partial disjoint
+
+entity Catedratico extends por_tipo_docente{
+    nif key
+}
+
+entity Titular extends por_tipo_docente{
+    nif key
+}
+
+hierarchy por_centro Estudiante partial
+
+entity Estudiante_Politecnica extends por_centro {
+    nif key
+}
+
+hierarchy por_edad Estudiante_Politecnica total disjoint
+
+entity Mayor_De_Edad extends por_edad {
+    nif key
+}
+
+entity Menor_De_Edad extends por_edad {
+    nif key
+}
+
+hierarchy por_titulacion Estudiante_Politecnica partial overlapping
+
+entity Estudiante_Informatica extends por_titulacion{
+    nif key
+}
+entity Estudiante_Civil extends por_titulacion{
+    nif key
+}
+entity Estudiante_Edificacion extends por_titulacion{
+    nif key
+}
 
 ---
 
@@ -251,6 +364,115 @@ Tenemos que modelar también las relaciones contenidas en la información dada:
 
 Escribe el texto BigER necesario para modelar todo esto y visualiza el resultado en el diagrama en VsCode. Antes de continuar asegúrate de estar entendiendo cómo se está representando gráficamente todo.
 
+SOLUCIÓN:
+
+entity Planeta{
+codigo key
+nombre
+numero_lunas
+rotacion_horas
+orbita_dias
+}
+
+entity Centro{
+codigo key
+nombre
+fecha_creacion
+coordenadas
+}
+
+entity Mineral{
+codigo key
+nombre
+descripcion
+}
+
+entity Nave_Espacial{
+matricula key
+modelo
+capacidad
+}
+
+weak entity Vuelo{
+fecha_inicio partial-key
+hora_inicio partial-key
+fecha_fin
+hora_fin
+}
+
+weak entity Cargamento{
+codigo partial-key
+fecha_empaquetado
+}
+
+weak entity Historico_Extraccion{
+    fecha partial-key
+    cantidad
+}
+
+entity Clase_Mineral{
+    codigo key
+    nombre
+}
+
+weak relationship extraido_por{
+    Historico_Extraccion[0..N]-> Centro[1..1]
+}
+
+weak relationship incluido_en{
+    Historico_Extraccion[0..N]-> Mineral[1..1]
+}
+
+weak relationship empaquetado_en{
+    Cargamento[0..N] -> Centro[1..1]
+}
+
+weak relationship realizado_por{
+    Vuelo[0..N] -> Nave_Espacial[1..1]
+}
+
+relationship forma_parte_de{
+    Cargamento[0..N] -> Mineral[1..1]
+    cantidad
+}
+
+relationship transportado_en{
+    Cargamento[1..N] -> Vuelo[0..1]
+}
+
+relationship origen_de{
+    Vuelo[0..N] -> Centro[1..1]
+}
+
+relationship destino_de{
+    Vuelo[0..N] -> Centro[1..1]
+}
+
+relationship ubicado_en{
+     Centro[1..N] -> Planeta[1..1]
+}
+
+relationship es_principal_en{
+     Centro[1..1] -> Planeta[0..1]
+}
+
+relationship encontrado_por{
+     Centro[0..N] -> Mineral[0..N]
+     fecha_hallazgo 
+}
+
+relationship asignada_a{
+     Nave_Espacial [0..N] -> Planeta[1..1]
+}
+
+relationship agrupa_a{
+	Mineral[1..N]-> Clase_Mineral[1..1]
+}
+
+relationship relacionado_con{
+	Mineral[0..N|Mineral_A]->Mineral[0..N|Mineral_B]
+}
+
 ---
 ### Ejercicio 06 - Enunciado ER 04 The Expanse Completo  (3)
 
@@ -280,6 +502,120 @@ Por tanto, debemos modificar el diagrama para:
 
 Escribe el texto BigER necesario para modelar todo esto y visualiza el resultado en el diagrama en VsCode. Antes de continuar asegúrate de estar entendiendo cómo se está representando gráficamente todo.
 
+SOLUCIÓN:
+entity Planeta{
+    codigo key
+    nombre
+    numero_lunas
+    rotacion_horas
+    orbita_dias
+}
+
+entity Centro{
+    codigo key
+    nombre
+    fecha_creacion
+    coordenadas
+}
+
+entity Mineral{
+    codigo key
+    nombre
+    descripcion
+}
+
+entity Vehiculo{
+    matricula key
+    modelo
+}
+
+hierarchy por_tipo_vehiculo Vehiculo partial
+
+entity Nave_Espacial extends por_tipo_vehiculo{
+    matricula key
+    capacidad
+}
+
+weak entity Vuelo{
+    fecha_inicio partial-key
+    hora_inicio partial-key
+    fecha_fin
+    hora_fin
+}
+
+weak entity Cargamento{
+    codigo partial-key
+    fecha_empaquetado
+}
+
+weak entity Historico_Extraccion{
+    fecha partial-key
+    cantidad
+}
+
+entity Clase_Mineral{
+    codigo key
+    nombre
+}
+
+weak relationship extraido_por{
+    Historico_Extraccion[0..N]-> Centro[1..1]
+}
+
+weak relationship incluido_en{
+    Historico_Extraccion[0..N]-> Mineral[1..1]
+}
+
+weak relationship empaquetado_en{
+    Cargamento[0..N] -> Centro[1..1]
+}
+
+weak relationship realizado_por{
+    Vuelo[0..N] -> Nave_Espacial[1..1]
+}
+
+relationship forma_parte_de{
+    Cargamento[0..N] -> Mineral[1..1]
+    cantidad
+}
+
+relationship transportado_en{
+    Cargamento[1..N] -> Vuelo[0..1]
+}
+
+relationship origen_de{
+    Vuelo[0..N] -> Centro[1..1]
+}
+
+relationship destino_de{
+    Vuelo[0..N] -> Centro[1..1]
+}
+
+relationship ubicado_en{
+    Centro[1..N] -> Planeta[1..1]
+}
+
+relationship es_principal_en{
+    Centro[1..1] -> Planeta[0..1]
+}
+
+relationship encontrado_por{
+    Centro[0..N] -> Mineral[0..N]
+    fecha_hallazgo 
+}
+
+relationship asignado_a{
+    Vehiculo[0..N] -> Planeta[1..1]
+}
+
+relationship agrupa_a{
+    Mineral[1..N]-> Clase_Mineral[1..1]
+}
+
+relationship relacionado_con{
+    Mineral[0..N|Mineral_A]->Mineral[0..N|Mineral_B]
+}
+
 ---
 
 ### Ejercicio 07 - Enunciado ER 04 The Expanse Completo  (4)
@@ -301,6 +637,151 @@ Posteriormente, nos indican que todos los centros deben tener un coordinador que
 Por último, nos indican que es necesario saber el Personal que es Astronauta ya que nos están diciendo que solo son ellos los que pilotan vuelos, por lo que tendremos que crear una subclase de Personal llamada Astronauta que solo se distingue del resto del Personal en que tiene una relación, que llamaremos **pilota** con los Vuelos. Por lo que nos dice el enunciado, podemos entender que un Astronauta habrá pilotado al menos un vuelo para ser Astronauta y claramente nos dice que un Vuelo puede tener muchos Astronautas pilotándolos.
 
 Escribe el texto BigER necesario para modelar todo esto y visualiza el resultado en el diagrama en VsCode. Antes de continuar asegúrate de estar entendiendo cómo se está representando gráficamente todo.
+
+SOLUCIÓN:
+entity Planeta{
+    codigo key
+    nombre
+    numero_lunas
+    rotacion_horas
+    orbita_dias
+}
+
+entity Centro{
+    codigo key
+    nombre
+    fecha_creacion
+    coordenadas
+}
+
+entity Mineral{
+    codigo key
+    nombre
+    descripcion
+}
+
+entity Vehiculo{
+    matricula key
+    modelo
+}
+
+hierarchy por_tipo_vehiculo Vehiculo partial
+
+entity Nave_Espacial extends por_tipo_vehiculo{
+    matricula key
+    capacidad
+}
+
+entity Personal{
+    numero_personal key
+    pasaporte unique
+    nombre_completo
+    fecha_alta
+    puesto
+}
+
+hierarchy por_tipo_personal Personal partial disjoint
+
+entity Directivo extends por_tipo_personal{
+    numero_personal key
+}
+
+entity Astronauta extends por_tipo_personal{
+    numero_personal key
+}
+
+weak entity Vuelo{
+    fecha_inicio partial-key
+    hora_inicio partial-key
+    fecha_fin
+    hora_fin
+}
+
+weak entity Cargamento{
+    codigo partial-key
+    fecha_empaquetado
+}
+
+weak entity Historico_Extraccion{
+    fecha partial-key
+    cantidad
+}
+
+entity Clase_Mineral{
+    codigo key
+    nombre
+}
+
+weak relationship extraido_por{
+    Historico_Extraccion[0..N]-> Centro[1..1]
+}
+
+weak relationship incluido_en{
+    Historico_Extraccion[0..N]-> Mineral[1..1]
+}
+
+weak relationship empaquetado_en{
+    Cargamento[0..N] -> Centro[1..1]
+}
+
+weak relationship realizado_por{
+    Vuelo[0..N] -> Nave_Espacial[1..1]
+}
+
+relationship forma_parte_de{
+    Cargamento[0..N] -> Mineral[1..1]
+    cantidad
+}
+
+relationship transportado_en{
+    Cargamento[1..N] -> Vuelo[0..1]
+}
+
+relationship origen_de{
+    Vuelo[0..N] -> Centro[1..1]
+}
+
+relationship destino_de{
+    Vuelo[0..N] -> Centro[1..1]
+}
+
+relationship ubicado_en{
+    Centro[1..N] -> Planeta[1..1]
+}
+
+relationship es_principal_en{
+    Centro[1..1] -> Planeta[0..1]
+}
+
+relationship encontrado_por{
+    Centro[0..N] -> Mineral[0..N]
+    fecha_hallazgo 
+}
+
+relationship asignado_a{
+    Vehiculo[0..N] -> Planeta[1..1]
+}
+
+relationship trabaja_en{
+    Personal[1..N] -> Centro[1..1]
+}
+
+relationship coordina{
+    Directivo[1..1] -> Centro[0..1]
+    fecha_inicio
+}
+
+relationship pilota{
+    Astronauta[1..N] -> Vuelo[0..N]
+}
+
+relationship agrupa_a{
+    Mineral[1..N]-> Clase_Mineral[1..1]
+}
+
+relationship relacionado_con{
+    Mineral[0..N|Mineral_A]->Mineral[0..N|Mineral_B]
+}
 
 ---
 
